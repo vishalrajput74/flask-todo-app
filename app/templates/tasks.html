@@ -128,7 +128,21 @@
     </th>
     <th>#</th>
         <th>Task</th>
-        <th>Due Date</th>
+        <th>
+          <a href="{{ url_for('tasks.view_tasks',
+            sort_by='due_date',
+            sort_order='desc' if request.args.get('sort_by')=='due_date' and request.args.get('sort_order')=='asc' else 'asc',
+            status=request.args.get('status','All'),
+            search=request.args.get('search',''),
+            per_page=request.args.get('per_page',5),
+            priority=request.args.get('priority','All')) }}"
+            style="text-decoration:none; color:inherit;">
+            Due Date
+            {% if request.args.get('sort_by') == 'due_date' %}
+              {{ '↑' if request.args.get('sort_order') == 'asc' else '↓' }}
+            {% endif %}
+          </a>
+        </th>
         <th>Priority</th>
         <th>Status</th>
         <th>Edit</th>

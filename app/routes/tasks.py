@@ -25,7 +25,9 @@ def get_redirect_params():
     priority = request.form.get('priority', request.args.get('priority', 'All'))  # ADD
     
     per_page = request.form.get('per_page') or request.args.get('per_page', 5)
-    return dict(page=page, status=status, search=search, per_page=per_page,priority=priority)
+    sort_by = request.args.get('sort_by', 'id')     
+    sort_order = request.args.get('sort_order', 'desc') 
+    return dict(page=page, status=status, search=search, per_page=per_page,priority=priority,sort_by=sort_by,sort_order=sort_order)
 
 
 #helper function for calculate_priority
@@ -85,8 +87,14 @@ def view_tasks():
             query = query.filter(Task.priority == None)
         else:
             query = query.filter_by(priority=priority)
-            
-    pagination = query.order_by(Task.id.desc()).paginate(
+    sort_by = request.args.get('sort_by', 'id')
+    sort_order = request.args.get('sort_order', 'desc')     
+    
+    if sort_by == 'due_date':
+        order = Task.due_date.asc() if sort_order == 'asc' else Task.due_date.desc()
+    else:
+        order = Task.id.desc()
+    pagination = query.order_by(order).paginate(
         page=page,
         per_page=per_page,
         error_out=False
