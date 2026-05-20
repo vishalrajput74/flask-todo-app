@@ -9,6 +9,7 @@ from app.extensions import db
 from app.models import Task
 from app.forms import TaskForm, EditTaskForm, UpdateStatusForm, DeleteTaskForm, ClearTasksForm, BulkActionForm 
 from datetime import date
+from sqlalchemy import nulls_last
 
 #create blueprint
 tasks_bp = Blueprint('tasks',__name__)
@@ -91,7 +92,10 @@ def view_tasks():
     sort_order = request.args.get('sort_order', 'desc')     
     
     if sort_by == 'due_date':
-        order = Task.due_date.asc() if sort_order == 'asc' else Task.due_date.desc()
+        if sort_order == 'asc':
+            order = Task.due_date.asc().nulls_last()
+        else:
+            order = Task.due_date.desc().nulls_last()
     else:
         order = Task.id.desc()
     pagination = query.order_by(order).paginate(
