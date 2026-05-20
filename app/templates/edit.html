@@ -1,0 +1,58 @@
+{% extends "base.html" %} {% block title %}Edit Task{% endblock %} {% block
+content %}
+
+<div class="login-box">
+  <h2>Edit Task</h2>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    <!-- preserve pagination/filter/search when submitting edit -->
+    <input
+      type="hidden"
+      name="page"
+      value="{{ request.args.get('page', 1) }}"
+    />
+    <input
+      type="hidden"
+      name="status"
+      value="{{ request.args.get('status', 'All') }}"
+    />
+    <input
+      type="hidden"
+      name="search"
+      value="{{ request.args.get('search', '') }}"
+    />
+    <!-- preserve per_page so edit submit returns to same page-size view -->
+    <input
+      type="hidden"
+      name="per_page"
+      value="{{ request.args.get('per_page', 5) }}"
+    />
+    <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+    <div class="form-group">
+      {{ form.title.label }} {{ form.title(class="form-control") }} {% if
+      form.title.errors %}
+      <span class="error">
+        {% for error in form.title.errors %}
+        <small>{{ error }}</small>
+        {% endfor %}
+      </span>
+      {% endif %}
+    </div>
+    <div class="form-group">
+  {{ form.due_date.label }}
+  {{ form.due_date(class="form-control") }}
+</div>
+
+    <div style="display: flex; gap: 8px; margin-top: 8px">
+      {{ form.submit(class="btn") }}
+      <a
+        href="{{ url_for('tasks.view_tasks',page=request.args.get('page', 1),status=request.args.get('status', 'All'),search=request.args.get('search', ''),per_page=request.args.get('per_page', 5),priority=request.args.get('priority', 'All')) }}"
+        class="btn"
+        >Cancel</a
+      >
+    </div>
+  </form>
+</div>
+
+{% endblock %}

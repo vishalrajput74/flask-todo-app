@@ -1,0 +1,311 @@
+{% extends "base.html" %} {% block title %}Tasks{% endblock %} {% block content
+%}
+ 
+<div class="task-box">
+  <div class="task-box-header">
+
+  <h2>Your Tasks</h2>
+  <a href="{{ url_for('tasks.export_csv',
+    status=request.args.get('status','All'),
+    search=request.args.get('search',''),
+    priority=request.args.get('priority','All')) }}"
+    class="btn-small">⬇ Export CSV</a>
+</div>
+
+    <div class="stats-grid">
+    <div class="stat-card total">
+      <div class="stat-label">Total</div>
+      <div class="stat-value">{{ stats.total }}</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value">{{ stats.pending }}</div>
+    </div>
+    <div class="stat-card working">
+      <div class="stat-label">Working</div>
+      <div class="stat-value">{{ stats.working }}</div>
+    </div>
+    <div class="stat-card done">
+      <div class="stat-label">Done</div>
+      <div class="stat-value">{{ stats.done }}</div>
+    </div>
+  </div>
+<form method="GET" action="{{ url_for('tasks.view_tasks') }}" class="filter-search-bar">
+<select name="status" class="filter-dropdown" onchange="this.form.submit()">    
+  <option value="All" {% if request.args.get('status','All')=='All' %}selected{% endif %}>All</option>
+    <option value="Pending" {% if request.args.get('status')=='Pending' %}selected{% endif %}>Pending</option>
+    <option value="Working" {% if request.args.get('status')=='Working' %}selected{% endif %}>Working</option>
+    <option value="Done" {% if request.args.get('status')=='Done' %}selected{% endif %}>Done</option>
+  </select>
+  
+  <!-- reset to first page on new search -->
+  <input type="hidden" name="page" value="1">
+  <!-- preserve other filters -->
+  <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
+  <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+  <input 
+    type="text" 
+    name="search" 
+    placeholder="Search tasks..."
+    value="{{ request.args.get('search','') }}"
+    class="search-input">
+
+  <button type="submit" class="btn-small">Search</button>
+
+</form>
+<div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+  <span style="font-size:12px;color:var(--text-secondary)">Priority:</span>
+  <a href="{{ url_for('tasks.view_tasks', status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page',5), priority='All') }}"
+     class="btn-small {% if priority == 'All' %}active-filter{% endif %}">All</a>
+  <a href="{{ url_for('tasks.view_tasks', status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page',5), priority='High') }}"
+     class="btn-small {% if priority == 'High' %}active-filter{% endif %}">🔴 High</a>
+  <a href="{{ url_for('tasks.view_tasks', status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page',5), priority='Medium') }}"
+     class="btn-small {% if priority == 'Medium' %}active-filter{% endif %}">🟠 Medium</a>
+  <a href="{{ url_for('tasks.view_tasks', status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page',5), priority='Low') }}"
+     class="btn-small {% if priority == 'Low' %}active-filter{% endif %}">🟢 Low</a>
+  <a href="{{ url_for('tasks.view_tasks', status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page',5), priority='None') }}"
+     class="btn-small {% if priority == 'None' %}active-filter{% endif %}">— No date</a>
+</div>
+
+  <form method="POST" action="{{ url_for('tasks.add_task') }}" novalidate>
+    {{ form.hidden_tag() }}
+    <!-- preserve current page/status/search across POST -->
+    <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">
+    <input type="hidden" name="status" value="{{ request.args.get('status', 'All') }}">
+    <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+    <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
+    <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+    <div class="form-group">
+      {{ form.title(placeholder="New task", class="form-control") }} {% if
+      form.title.errors %}
+      <span class="error">
+        {% for error in form.title.errors %}
+        <small>{{ error }}</small>
+        {% endfor %}
+      </span>
+      {% endif %}
+    </div>
+    <div class="form-group">
+  {{ form.due_date(class="form-control") }}
+</div>
+    {{ form.submit(class="btn") }}
+  </form>
+
+  {% if tasks %}
+  <form
+    method="POST"
+    action="{{ url_for('tasks.clear_tasks') }}"
+    style="display: inline"
+  >
+    {{ clear_form.hidden_tag() }} {{ clear_form.submit(class="btn btn-clear btn-reset",
+    onclick="return confirm('Clear all tasks?')") }}
+    <!-- preserve current page/status/search across POST -->
+    <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">
+    <input type="hidden" name="status" value="{{ request.args.get('status', 'All') }}">
+    <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+
+    <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
+    <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+  </form>
+
+
+  <form id="bulk-form" method="POST" action="{{ url_for('tasks.bulk_action') }}">
+  {{ bulk_action_form.hidden_tag() }}
+  <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">
+  <input type="hidden" name="status" value="{{ request.args.get('status', 'All') }}">
+  <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+  <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+  <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
+</form>
+
+  <table class="tasks-table">
+    <thead>
+  <tr>
+    <th>
+      <input type="checkbox" id="select_all" title="Select all on this page">
+
+
+    </th>
+    <th>#</th>
+        <th>Task</th>
+        <th>Due Date</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for task in tasks %}
+      <tr>
+  <td>
+    <input type="checkbox" name="task_ids" class="task-checkbox" value="{{ task.id }}" form="bulk-form">
+  </td>
+        <td>{{ loop.index0 + 1 + (pagination.page - 1) * pagination.per_page }}</td>
+        <td>{{ task.title }}</td>
+      <td>
+  {% if task.due_date %}
+    {% if task.due_date < today %}
+      <span class="badge due-overdue">⚠ {{ task.due_date.strftime('%d %b') }}</span>
+    {% elif task.due_date == today %}
+      <span class="badge due-today">Today</span>
+    {% else %}
+      <span class="badge due-upcoming">{{ task.due_date.strftime('%d %b') }}</span>
+    {% endif %}
+  {% else %}
+    <span style="color:var(--text-muted)">—</span>
+  {% endif %}
+</td>
+
+<td>
+  {% if task.due_date %}
+    {% set days = (task.due_date - today).days %}
+    {% if days <= 2 %}
+      <span class="badge p-high">🔴 High</span>
+    {% elif days <= 5 %}
+      <span class="badge p-medium">🟠 Medium</span>
+    {% else %}
+      <span class="badge p-low">🟢 Low</span>
+    {% endif %}
+  {% else %}
+    <span style="color:var(--text-muted)">—</span>
+  {% endif %}
+</td>
+
+  <td>
+  <form action="{{ url_for('tasks.update_status', task_id=task.id) }}" method="post" style="display:inline">
+    {{ update_status_form.hidden_tag() }}
+    <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">
+    <input type="hidden" name="status_filter" value="{{ request.args.get('status', 'All') }}">
+    <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+    <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
+    <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+    <select name="status" onchange="this.form.submit()" class="status-sel {{ task.status|lower }}">
+      <option {% if task.status=='Pending' %}selected{% endif %}>Pending</option>
+      <option {% if task.status=='Working' %}selected{% endif %}>Working</option>
+      <option {% if task.status=='Done' %}selected{% endif %}>Done</option>
+    </select>
+  </form>
+</td>
+    <td>
+      <a href="{{ url_for('tasks.edit_task',task_id=task.id,page=request.args.get('page', 1),status=request.args.get('status', 'All'),search=request.args.get('search', ''),per_page=request.args.get('per_page', 5),priority=request.args.get('priority', 'All')) }}"
+            class="btn-small"
+            >Edit</a
+          >
+        </td>
+        <td>
+          <form
+            action="{{ url_for('tasks.delete_task', task_id=task.id) }}"
+            method="post"
+            style="display: inline"
+          >
+            {{ delete_form.hidden_tag() }}
+            <!-- preserve current page/status/search across POST -->
+            <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">
+            <input type="hidden" name="status" value="{{ request.args.get('status', 'All') }}">
+            <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+            <!-- preserve per_page so delete keeps the same page-size view -->
+            <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
+            <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+            <button
+              type="submit"
+              class="btn-small btn-small-danger"
+              onclick="return confirm('Delete this task?');"
+            >
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div style="margin-top: 15px;">
+  <button type="submit" form="bulk-form" name="action" value="delete" onclick="return confirm('Delete selected tasks?');" class="btn-small btn-small-danger ">
+    Delete Selected
+  </button>
+  <button type="submit" form="bulk-form" name="action" value="done" class="btn-small btn-done">
+    Mark as Done
+  </button>
+  <button type="submit" form="bulk-form" name="action" value="working" class="btn-small btn-working">
+    Mark as Working
+  </button>
+</div>
+  {% set start = (pagination.page - 1) * pagination.per_page + 1 %}
+  {% set end = start + (tasks|length) - 1 %}
+  <p class="results-info">
+    {% if start == end %}
+      Showing {{ start }} of {{ pagination.total }}
+    {% else %}
+      Showing {{ start }} - {{ end }} of {{ pagination.total }}
+    {% endif %}
+  </p>
+  {% if pagination and pagination.pages > 1 %}
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+    {% if pagination.has_prev %}
+      <li class="page-item">
+          <!-- keep per_page in pagination links so page-size selection does not reset -->
+<a class="page-link" href="{{ url_for('tasks.view_tasks', page=pagination.prev_num, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All')) }}">Previous</a>
+
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Previous</span></li>
+    {% endif %}
+
+    {% for p in range(1, pagination.pages + 1) %}
+      {% if p == pagination.page %}
+        <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+      {% else %}
+        <li class="page-item">
+<a class="page-link" href="{{ url_for('tasks.view_tasks', page=p, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All')) }}">{{ p }}</a>
+
+        </li>
+        {% endif %}
+
+    {% endfor %}
+
+    {% if pagination.has_next %}
+      <li class="page-item">
+<a class="page-link" href="{{ url_for('tasks.view_tasks', page=pagination.next_num, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All')) }}">Next</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">Next</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+  {% else %}
+  <p>No tasks yet. Add one above!</p>
+  {% endif %}
+
+<!-- per_page dropdown: always visible so page-size selection does not disappear when only 1 page exists -->
+<form class="per-page-form" method="GET" action="{{ url_for('tasks.view_tasks') }}">
+  <input type="hidden" name="page" value="1">
+  <input type="hidden" name="status" value="{{ request.args.get('status', 'All') }}">
+  <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+  <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+
+  <label for="per_page">Show:</label>
+  <select name="per_page" id="per_page" onchange="this.form.submit()">
+    <option value="5" {% if request.args.get('per_page', '5') == '5' %}selected{% endif %}>5</option>
+    <option value="10" {% if request.args.get('per_page') == '10' %}selected{% endif %}>10</option>
+    <option value="25" {% if request.args.get('per_page') == '25' %}selected{% endif %}>25</option>
+  </select>
+  items per page
+</form>
+</div>
+
+<!-- Select All functionality -->
+<script>
+  const selectAll = document.getElementById("select_all");
+  const taskCheckboxes = document.querySelectorAll(".task-checkbox");
+
+  if (selectAll) {
+    selectAll.addEventListener("change", function () {
+      taskCheckboxes.forEach(cb => cb.checked = this.checked);
+    });
+  }
+</script>
+
+{% endblock %}
