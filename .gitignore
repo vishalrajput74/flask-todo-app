@@ -4,4 +4,3 @@ __pycache__/
 instance/todo.db
 .env
 *.log
-.pytest_cache/
