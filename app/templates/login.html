@@ -25,13 +25,10 @@
       {% endif %}
     </div>
 
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+  <div class="remember-me">
   {{ form.remember_me() }}
-  <label for="remember_me" style="font-size:13px; color:var(--text-secondary); cursor:pointer;">
-    Remember me for 30 days
-  </label>
+  <label for="remember_me">Remember me for 30 days</label>
 </div>
-
     <div>{{ form.submit(class="btn") }}</div>
   </form>
 

@@ -590,3 +590,16 @@ a.stat-card {
   text-decoration: none;
   color: inherit;
 }
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.remember-me label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
