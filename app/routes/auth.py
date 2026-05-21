@@ -4,7 +4,8 @@ from app.extensions import db
 from app.models import User
 from app.forms import LoginForm, RegisterForm, ChangePasswordForm
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from datetime import timedelta
+from flask import current_app
 #blueprint object create kara
 
 auth_bp = Blueprint('auth' ,__name__)
@@ -30,9 +31,12 @@ def login():
             session['user_id'] = user.id
             session['username'] = user.username
             # print("SESSION:", dict(session)) 
-
             # print("login success")
             # print(" Session after login:", dict(session))
+            
+            if form.remember_me.data:
+                session.permanent = True
+                current_app.permanent_session_lifetime = timedelta(days=30)
             flash('Login successful!', 'success')
             return redirect(url_for('tasks.view_tasks'))
         else:

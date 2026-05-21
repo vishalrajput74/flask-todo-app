@@ -5,6 +5,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.fields import DateField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError,Optional
 from app.models import User
+from wtforms import BooleanField
 
 
 def validate_future_date(form, field):
@@ -15,6 +16,7 @@ def validate_future_date(form, field):
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 class RegisterForm(FlaskForm):
