@@ -29,6 +29,10 @@
       <div class="stat-label">Done</div>
       <div class="stat-value">{{ stats.done }}</div>
     </div>
+     <div class="stat-card overdue">
+    <div class="stat-label">Overdue</div>
+    <div class="stat-value">{{ stats.overdue }}</div>
+  </div>
   </div>
 <form method="GET" action="{{ url_for('tasks.view_tasks') }}" class="filter-search-bar">
 <select name="status" class="filter-dropdown" onchange="this.form.submit()">    

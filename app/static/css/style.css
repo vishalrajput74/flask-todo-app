@@ -502,6 +502,7 @@ footer p { margin: 0; }
   .tasks-table tbody tr {
     display: block;
     border: 1px solid var(--border);
+
     border-radius: var(--radius-md);
     margin-bottom: 10px;
     padding: 10px;
@@ -558,10 +559,12 @@ footer p { margin: 0; }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 10px;
   margin-bottom: 16px;
 }
+.stat-card.overdue .stat-value { color: var(--red); }
+
 
 .stat-value {
   font-size: 22px;

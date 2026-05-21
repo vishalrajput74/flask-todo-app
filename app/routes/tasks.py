@@ -120,6 +120,11 @@ def view_tasks():
     'pending': Task.query.filter_by(user_id=session['user_id'], status='Pending').count(),
     'working': Task.query.filter_by(user_id=session['user_id'], status='Working').count(),
     'done': Task.query.filter_by(user_id=session['user_id'], status='Done').count(),
+    'overdue': Task.query.filter(
+        Task.user_id == session['user_id'],
+        Task.due_date < date.today(),
+        Task.status != 'Done'
+    ).count(),
 }
     
     form = TaskForm()  # Pass form to template
