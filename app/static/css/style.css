@@ -571,6 +571,8 @@ footer p { margin: 0; }
   font-weight: 500;
 }
 
+
+
 .stat-card.total .stat-value   { color: var(--blue-dark); }
 .stat-card.pending .stat-value { color: #854d0e; }
 .stat-card.working .stat-value { color: #075985; }
