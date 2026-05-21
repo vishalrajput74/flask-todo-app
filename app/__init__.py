@@ -25,15 +25,9 @@ def create_app(): #factory function which is create flask app
     migrate.init_app(app, db) 
     #Blueprint ko import krke register kara
     from app.routes.auth import auth_bp  #login/signup related routes
-    from app.routes.tasks import tasks_bp 
-    from app.routes.api_auth import api_auth_bp
-    from app.routes.api_tasks import api_tasks_bp
-    
-    csrf.exempt(api_auth_bp)
+    from app.routes.tasks import tasks_bp
 
     #register blueprint ne call kri auth_bp pass kiya
     app.register_blueprint(auth_bp)
     app.register_blueprint(tasks_bp)
-    app.register_blueprint(api_auth_bp)
-    app.register_blueprint(api_tasks_bp)
     return app
