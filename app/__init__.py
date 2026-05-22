@@ -15,7 +15,7 @@ def create_app(): #factory function which is create flask app
     
     # app.config['SECRET_KEY'] = 'your-secret-key' # for security 
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db' #database path define
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL','sqlite:///todo.db') 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False #Tracking off for avoid extra memory use and make peformance fast
     
     
