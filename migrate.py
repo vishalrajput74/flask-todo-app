@@ -9,6 +9,8 @@ def parse_date(date_value):
         return None
     return datetime.strptime(date_value, "%Y-%m-%d").date()
 app = create_app()
+print("DB USED:", app.config['SQLALCHEMY_DATABASE_URI'])
+
 
 SQLITE_DB = "instance/todo.db"
 
