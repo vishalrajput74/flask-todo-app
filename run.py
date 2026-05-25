@@ -1,5 +1,5 @@
 from app.models import Task
-
+from flask_migrate import upgrade
 from app import create_app,db
 import os
 
@@ -11,7 +11,7 @@ print(app.config["SQLALCHEMY_DATABASE_URI"])
 with app.app_context():
     print(Task.query.count())
     db.create_all()
-    
+    upgrade()
 if __name__=="__main__":
     app.run(debug=False,port=5001)
     
