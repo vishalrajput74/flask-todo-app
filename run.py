@@ -9,8 +9,10 @@ print(app.config["SQLALCHEMY_DATABASE_URI"])
 # print("Current Working Directory:", os.getcwd())
 
 with app.app_context():
-    # print(Task.query.count())
-    upgrade()
+    try:
+        upgrade()
+    except Exception as e:
+        print("Migration error:", e)
     db.create_all()
 
 if __name__=="__main__":
