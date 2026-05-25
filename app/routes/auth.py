@@ -62,7 +62,8 @@ def register():
         # Create new user
         new_user = User(
             username=form.username.data,
-            password=hashed_password
+            password=hashed_password,
+            email=form.email.data or None
 
             # password=form.password.data  
         )

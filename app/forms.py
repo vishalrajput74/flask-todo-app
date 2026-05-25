@@ -3,7 +3,7 @@ from datetime import date
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.fields import DateField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError,Optional
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError,Optional,Email
 from app.models import User
 from wtforms import BooleanField
 
@@ -24,6 +24,10 @@ class RegisterForm(FlaskForm):
         DataRequired(),
         Length(min=3, max=20)
     ])
+    email = StringField('Email', validators=[  
+        Optional(),
+        Email(message='Valid email daalo')
+        ])
     password = PasswordField('Password', validators=[
         DataRequired(),
         Length(min=6)
