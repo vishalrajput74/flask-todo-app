@@ -1,5 +1,4 @@
 from app.models import Task
-from flask_migrate import upgrade
 from app import create_app,db
 import os
 
@@ -9,10 +8,7 @@ print(app.config["SQLALCHEMY_DATABASE_URI"])
 # print("Current Working Directory:", os.getcwd())
 
 with app.app_context():
-    try:
-        upgrade()
-    except Exception as e:
-        print("Migration error:", e)
+  
     db.create_all()
 
 if __name__=="__main__":
