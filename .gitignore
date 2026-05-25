@@ -4,3 +4,5 @@ __pycache__/
 instance/todo.db
 .env
 *.log
+instance/
+*.db
