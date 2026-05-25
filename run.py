@@ -9,9 +9,10 @@ print(app.config["SQLALCHEMY_DATABASE_URI"])
 # print("Current Working Directory:", os.getcwd())
 
 with app.app_context():
-    print(Task.query.count())
-    db.create_all()
+    # print(Task.query.count())
     upgrade()
+    db.create_all()
+
 if __name__=="__main__":
     app.run(debug=False,port=5001)
     
