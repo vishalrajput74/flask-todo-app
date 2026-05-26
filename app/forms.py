@@ -46,6 +46,11 @@ class RegisterForm(FlaskForm):
 
         if user:
             raise ValidationError('Username already exists!')
+    def validate_email(self, email):
+        if email.data:
+            user = User.query.filter_by(email=email.data).first()
+            if user:
+                raise ValidationError('Email already registered.')
 
 class TaskForm(FlaskForm):
     title = StringField('Task', validators=[
