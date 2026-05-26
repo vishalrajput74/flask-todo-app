@@ -33,7 +33,12 @@
 
     <div>
       {{ form.password.label }}
+      <div class="password-wrapper">
+
       {{ form.password(class="form-control") }}
+      <button type="button" class="password-toggle"
+            onclick="togglePassword('password')">👁</button>
+  </div>
       {% if form.password.errors %}
         <span class="error">
           {% for error in form.password.errors %}
@@ -45,7 +50,13 @@
 
     <div>
       {{ form.confirm_password.label }}
+      <div class="password-wrapper">
+
       {{ form.confirm_password(class="form-control") }}
+      <button type="button" class="password-toggle"
+            onclick="togglePassword('confirm_password')">👁</button>
+  </div>
+
       {% if form.confirm_password.errors %}
         <span class="error">
           {% for error in form.confirm_password.errors %}
