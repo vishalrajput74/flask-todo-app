@@ -59,15 +59,6 @@ def view_tasks():
     search = request.args.get('search')
     priority = request.args.get('priority', 'All') 
      # Priority auto-calculate + save
-    all_tasks = Task.query.filter_by(user_id=session['user_id']).all()
-    changed = False
-    for task in all_tasks:
-        new_priority = calculate_priority(task.due_date)
-        if task.priority != new_priority:
-            task.priority = new_priority
-            changed = True
-    if changed:
-        db.session.commit()
     
      #base query
     query = Task.query.filter_by(user_id=session['user_id'])
@@ -151,7 +142,9 @@ def add_task():
     if form.validate_on_submit():
         # print("form valid")
         # print("title",form.title.data)
-        new_task = Task(title=form.title.data,due_date=form.due_date.data,status='Pending',user_id=session['user_id'])
+        priority = calculate_priority(form.due_date.data)
+
+        new_task = Task(title=form.title.data,due_date=form.due_date.data,status='Pending',user_id=session['user_id'], priority=priority )
         db.session.add(new_task)
         db.session.commit()
         
@@ -242,6 +235,7 @@ def edit_task(task_id):
         
         task.title = form.title.data
         task.due_date = form.due_date.data
+        task.priority = calculate_priority(form.due_date.data)
         db.session.commit()
         flash("Task updated successfully!", "success")
         return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
