@@ -17,7 +17,7 @@ def create_app(): #factory function which is create flask app
     # DATABASE FIX (Render PostgreSQL safe)
     # ===============================
     db_url = os.environ.get('DATABASE_URL', 'sqlite:///todo.db')
-    print("DATABASE URL:", db_url)
+    # print("DATABASE URL:", db_url)
 
     # Render fix: postgres:// → postgresql://
     if db_url.startswith("postgres://"):
