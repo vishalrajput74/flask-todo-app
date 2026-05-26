@@ -140,7 +140,7 @@ today=date.today(),priority=priority,stats=stats)
 
 @tasks_bp.route('/add', methods=["POST"])
 def add_task():
-    print("add task route hit")
+    # print("add task route hit")
     # print("session",dict(session))
     if 'user_id' not in session:
         # print("not logged in ")
@@ -150,7 +150,7 @@ def add_task():
     
     if form.validate_on_submit():
         # print("form valid")
-        print("title",form.title.data)
+        # print("title",form.title.data)
         new_task = Task(title=form.title.data,due_date=form.due_date.data,status='Pending',user_id=session['user_id'])
         db.session.add(new_task)
         db.session.commit()

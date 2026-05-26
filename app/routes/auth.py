@@ -29,7 +29,7 @@ def login():
 
             # session['user'] = user.username
             session['user_id'] = user.id
-            print("DEBUG: logged-in user_id=", user.id)
+            # print("DEBUG: logged-in user_id=", user.id)
             session['username'] = user.username
             # print("SESSION:", dict(session)) 
             # print("login success")
