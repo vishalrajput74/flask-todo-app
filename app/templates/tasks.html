@@ -101,8 +101,14 @@
     action="{{ url_for('tasks.clear_tasks') }}"
     style="display: inline"
   >
-    {{ clear_form.hidden_tag() }} {{ clear_form.submit(class="btn btn-clear btn-reset",
-    onclick="return confirm('Clear all tasks?')") }}
+  {{ clear_form.hidden_tag() }}
+  {% set active_status = request.args.get('status', 'All') %}
+
+{{ clear_form.submit(
+    class="btn btn-clear btn-reset",
+    value="Clear " + (active_status if active_status != 'All' else 'All') + " Tasks",
+    onclick="return confirm('Clear " + (active_status if active_status != 'All' else 'all') + " tasks?')") 
+}}
     <!-- preserve current page/status/search across POST -->
     <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">
     <input type="hidden" name="status" value="{{ request.args.get('status', 'All') }}">
