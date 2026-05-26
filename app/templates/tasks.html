@@ -176,11 +176,10 @@
 </td>
 
 <td>
-  {% if task.due_date %}
-    {% set days = (task.due_date - today).days %}
-    {% if days <= 2 %}
+  {% if task.priority %}
+    {% if task.priority == 'High' %}
       <span class="badge p-high">🔴 High</span>
-    {% elif days <= 5 %}
+    {% elif task.priority == 'Medium' %}
       <span class="badge p-medium">🟠 Medium</span>
     {% else %}
       <span class="badge p-low">🟢 Low</span>
