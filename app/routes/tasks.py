@@ -21,7 +21,7 @@ def get_redirect_params():
         page = int(page)
     except (TypeError, ValueError):
         page = 1
-    status = request.form.get('status_filter', request.args.get('status', 'All'))
+    status = request.form.get('status', request.args.get('status', 'All'))
     search = request.form.get('search', request.args.get('search', ''))
     priority = request.form.get('priority', request.args.get('priority', 'All'))  # ADD
     
@@ -182,7 +182,7 @@ def update_status(task_id):
         flash("Task not found!", "error")
         return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
-    new_status = request.form.get('status')
+    new_status = request.form.get('new_status')
     if new_status in ['Pending', 'Working', 'Done']:
         task.status = new_status
         db.session.commit()
