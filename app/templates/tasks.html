@@ -174,7 +174,11 @@
       <td>
   {% if task.due_date %}
     {% if task.due_date < today %}
-      <span class="badge due-overdue">⚠ {{ task.due_date.strftime('%d %b') }}</span>
+      {% if task.status != 'Done' %}
+        <span class="badge due-overdue">⚠ {{ task.due_date.strftime('%d %b') }}</span>
+      {% else %}
+        <span class="badge due-upcoming">{{ task.due_date.strftime('%d %b') }}</span>
+      {% endif %}
     {% elif task.due_date == today %}
       <span class="badge due-today">Today</span>
     {% else %}
