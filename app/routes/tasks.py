@@ -189,8 +189,8 @@ def update_status(task_id):
         flash('Status updated!', 'success')
     
     # return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
-    params = get_redirect_params()
-    return redirect(url_for('tasks.view_tasks', **params))
+    # params = get_redirect_params()
+    return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
 @tasks_bp.route('/clear', methods=["POST"])
 def clear_tasks():
