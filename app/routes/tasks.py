@@ -145,7 +145,7 @@ def add_task():
         # print("form valid")
         # print("title",form.title.data)
         priority = calculate_priority(form.due_date.data)
-        print(f"Priority calculated: {priority}")
+        # print(f"Priority calculated: {priority}")
         new_task = Task(title=form.title.data,due_date=form.due_date.data,status='Pending',user_id=session['user_id'], priority=priority )
         db.session.add(new_task)
         db.session.commit()
