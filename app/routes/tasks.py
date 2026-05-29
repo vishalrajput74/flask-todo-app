@@ -48,7 +48,7 @@ def view_tasks():
     if 'user_id' not in session:
         # print("user not loged in")
         return redirect(url_for('auth.login'))
-    print("--- view_tasks called ---")  
+    # print("--- view_tasks called ---")  
 
     page = request.args.get('page', 1, type=int)
     # per_page dropdown feature: read selected items-per-page from query string
@@ -149,7 +149,7 @@ def add_task():
         new_task = Task(title=form.title.data,due_date=form.due_date.data,status='Pending',user_id=session['user_id'], priority=priority )
         db.session.add(new_task)
         db.session.commit()
-        print(f"Task saved with priority: {new_task.priority}")
+        # print(f"Task saved with priority: {new_task.priority}")
         
         # print("task saved with id",new_task.id)
         flash('Task added successfully!', 'success')
@@ -239,7 +239,7 @@ def edit_task(task_id):
         task.title = form.title.data
         task.due_date = form.due_date.data
         task.priority = calculate_priority(form.due_date.data)
-        print(f"Priority updated to: {task.priority}") 
+        # print(f"Priority updated to: {task.priority}") 
 
         db.session.commit()
         flash("Task updated successfully!", "success")
