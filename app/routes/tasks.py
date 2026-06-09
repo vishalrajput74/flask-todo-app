@@ -10,7 +10,7 @@ from app.models import Task
 from app.forms import TaskForm, EditTaskForm, UpdateStatusForm, DeleteTaskForm, ClearTasksForm, BulkActionForm 
 from datetime import date
 from sqlalchemy import nulls_last
-from app.routes.auth import login_required
+from app.utils import login_required
 
 #create blueprint
 tasks_bp = Blueprint('tasks',__name__)
