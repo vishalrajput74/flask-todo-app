@@ -2,7 +2,7 @@ from flask import Blueprint,render_template,redirect,request,url_for,flash,sessi
 # from app import db
 from app.extensions import db
 from app.models import User
-from app.forms import LoginForm, RegisterForm, ChangePasswordForm
+from app.forms import LoginForm, RegisterForm, ChangePasswordForm,ProfileForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 from flask import current_app
@@ -119,7 +119,29 @@ def change_password():
 
     return render_template('change_password.html', form=form)
 
+@auth_bp.route('/profile', methods=["GET", "POST"])
+@login_required
+def profile():
+    user = db.session.get(User, session['user_id'])
+    form = ProfileForm(current_user_id=user.id)
 
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.email = form.email.data or None
+        db.session.commit()
+
+        # Session update karo — navbar mein naya naam dikhega
+        session['username'] = user.username
+
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('auth.profile'))
+
+    elif request.method == "GET":
+        # Form mein existing data pre-fill karo
+        form.username.data = user.username
+        form.email.data = user.email
+
+    return render_template('profile.html', form=form, user=user)
 
 
 

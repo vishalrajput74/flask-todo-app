@@ -92,3 +92,31 @@ class ChangePasswordForm(FlaskForm):
     submit = SubmitField('Change Password')
 class BulkActionForm(FlaskForm):
     submit = SubmitField('Apply')
+    
+    
+    
+class ProfileForm(FlaskForm):
+    username = StringField('Username', validators=[
+        DataRequired(),
+        Length(min=3, max=20)
+    ])
+    email = StringField('Email', validators=[
+        Optional(),
+        Email(message='Please enter a valid email')
+    ])
+    submit = SubmitField('Update Profile')
+
+    def __init__(self, current_user_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.current_user_id = current_user_id
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user and user.id != self.current_user_id:
+            raise ValidationError('Username already taken!')
+
+    def validate_email(self, email):
+        if email.data:
+            user = User.query.filter_by(email=email.data).first()
+            if user and user.id != self.current_user_id:
+                raise ValidationError('Email already registered.')
