@@ -6,6 +6,8 @@ from app.forms import LoginForm, RegisterForm, ChangePasswordForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 from flask import current_app
+from app.utils import login_required
+
 #blueprint object create kara
 
 auth_bp = Blueprint('auth' ,__name__)
@@ -94,10 +96,11 @@ def logout():
 
 
 @auth_bp.route('/change-password', methods=["GET", "POST"])
+@login_required 
 def change_password():
-    if 'user_id' not in session:
-        flash('Please login first', 'error')
-        return redirect(url_for('auth.login'))
+    # if 'user_id' not in session:
+    #     flash('Please login first', 'error')
+    #     return redirect(url_for('auth.login'))
 
     form = ChangePasswordForm()
 
