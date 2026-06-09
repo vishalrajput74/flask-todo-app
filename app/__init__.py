@@ -5,6 +5,8 @@ from flask import Flask
 # from flask_sqlalchemy import SQLAlchemy
 # from flask_wtf.csrf import CSRFProtect
 from app.extensions import db, csrf,migrate
+from datetime import timedelta
+
 
 #Create database object globally
 # db = SQLAlchemy()
@@ -25,6 +27,8 @@ def create_app(): #factory function which is create flask app
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-key")
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+    app.config["SESSION_PERMANENT"] = False 
     #Database ko app se connect kara
     db.init_app(app)
     csrf.init_app(app)  # initialize extensions

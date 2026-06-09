@@ -39,7 +39,8 @@ def login():
             
             if form.remember_me.data:
                 session.permanent = True
-                current_app.permanent_session_lifetime = timedelta(days=30)
+            else:
+                session.permanent = False
             flash('Login successful!', 'success')
             return redirect(url_for('tasks.view_tasks'))
         else:
