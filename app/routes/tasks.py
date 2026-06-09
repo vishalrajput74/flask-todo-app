@@ -10,6 +10,7 @@ from app.models import Task
 from app.forms import TaskForm, EditTaskForm, UpdateStatusForm, DeleteTaskForm, ClearTasksForm, BulkActionForm 
 from datetime import date
 from sqlalchemy import nulls_last
+from app.routes.auth import login_required
 
 #create blueprint
 tasks_bp = Blueprint('tasks',__name__)
@@ -42,12 +43,13 @@ def calculate_priority(due_date):
     
     
 @tasks_bp.route('/')
+@login_required 
 def view_tasks():
     # print("view task route hit")
     # print("session ", dict(session), flush=True)
-    if 'user_id' not in session:
+    # if 'user_id' not in session:
         # print("user not loged in")
-        return redirect(url_for('auth.login'))
+        # return redirect(url_for('auth.login'))
     # print("--- view_tasks called ---")  
 
     page = request.args.get('page', 1, type=int)
@@ -132,12 +134,13 @@ def view_tasks():
 today=date.today(),priority=priority,stats=stats)
 
 @tasks_bp.route('/add', methods=["POST"])
+@login_required 
 def add_task():
     # print("add task route hit")
     # print("session",dict(session))
-    if 'user_id' not in session:
+    # if 'user_id' not in session:
         # print("not logged in ")
-        return redirect(url_for('auth.login'))
+        # return redirect(url_for('auth.login'))
     
     form = TaskForm()
     
@@ -164,10 +167,11 @@ def add_task():
 
 
 @tasks_bp.route('/update-status/<int:task_id>', methods=["POST"])
+@login_required 
 def update_status(task_id):
-    if 'user_id' not in session:
-        flash("Please login first", "error")
-        return redirect(url_for('auth.login'))
+    # if 'user_id' not in session:
+    #     flash("Please login first", "error")
+    #     return redirect(url_for('auth.login'))
     
     form = UpdateStatusForm()
     
@@ -193,10 +197,11 @@ def update_status(task_id):
     return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
 @tasks_bp.route('/clear', methods=["POST"])
+@login_required 
 def clear_tasks():
-    if 'user_id' not in session:
-        flash("Please login first", "error")
-        return redirect(url_for('auth.login'))
+    # if 'user_id' not in session:
+    #     flash("Please login first", "error")
+    #     return redirect(url_for('auth.login'))
     
     form = ClearTasksForm() # validation
     
@@ -218,10 +223,11 @@ def clear_tasks():
 
 
 @tasks_bp.route('/edit/<int:task_id>', methods=["GET", "POST"])
+@login_required 
 def edit_task(task_id):
     # task = Task.query.get(task_id)
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    # if 'user_id' not in session:
+    #     return redirect(url_for('auth.login'))
     task = Task.query.filter_by(id=task_id,user_id=session['user_id']).first()
     if not task:
         flash("Task not found", "error")
@@ -251,10 +257,11 @@ def edit_task(task_id):
     return render_template('edit.html', task=task, form=form)
 
 @tasks_bp.route('/delete/<int:task_id>', methods=["POST"])
+@login_required 
 def delete_task(task_id):
-    if 'user_id' not in session:
-       flash("Please login first", "error")
-       return redirect(url_for('auth.login'))
+    # if 'user_id' not in session:
+    #    flash("Please login first", "error")
+    #    return redirect(url_for('auth.login'))
     
     form = DeleteTaskForm()  # validation
     
@@ -274,10 +281,11 @@ def delete_task(task_id):
     return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
 @tasks_bp.route('/bulk-action', methods=["POST"])
+@login_required 
 def bulk_action():
-    if 'user_id' not in session:
-        flash("Please login first", "error")
-        return redirect(url_for('auth.login'))
+    # if 'user_id' not in session:
+    #     flash("Please login first", "error")
+    #     return redirect(url_for('auth.login'))
 
     form = BulkActionForm()
 
@@ -331,9 +339,10 @@ def bulk_action():
     return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
 @tasks_bp.route('/export-csv')
+@login_required 
 def export_csv():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    # if 'user_id' not in session:
+    #     return redirect(url_for('auth.login'))
 
     query = Task.query.filter_by(user_id=session['user_id'])
     
