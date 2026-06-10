@@ -293,24 +293,30 @@ footer p { margin: 0; }
 .search-input { min-width: 200px; }
 
 /* ── Add Task Form ── */
-.task-box > form .form-group {
+.task-box .add-task-form .form-group {
   display: flex;
   gap: 8px;
   align-items: flex-start;
   margin-bottom: 0;
 }
 
-.task-box > form .form-control {
+.task-box .add-task-form .form-control {
   flex: 1;
 }
 
-.task-box > form .btn {
+.task-box .add-task-form .btn {
   width: auto;
   padding: 9px 20px;
   white-space: nowrap;
   margin-top: 0;
 }
 
+/* Clear Tasks button fix */
+.task-box .btn-clear,
+.task-box .btn-reset {
+  width: auto;
+  padding: 9px 20px;
+}
 /* ── Tasks Table ── */
 .tasks-table {
   width: 100%;
@@ -627,4 +633,13 @@ a.stat-card {
 
 .password-toggle:hover {
   color: var(--blue-mid);
+}
+
+/* Profile / standalone form label fix */
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
 }

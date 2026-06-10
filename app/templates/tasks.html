@@ -71,7 +71,7 @@
      class="btn-small {% if priority == 'None' %}active-filter{% endif %}">— No date</a>
 </div>
 
-  <form method="POST" action="{{ url_for('tasks.add_task') }}" novalidate>
+  <form method="POST" action="{{ url_for('tasks.add_task') }}" class="add-task-form" novalidate>
     {{ form.hidden_tag() }}
     <!-- preserve current page/status/search across POST -->
     <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">

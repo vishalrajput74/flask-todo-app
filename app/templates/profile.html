@@ -6,16 +6,17 @@
   <h2>My Profile</h2>
 
   <div style="background:#f8fafc; border-radius:8px; padding:12px 16px; margin-bottom:20px; font-size:13px; color:var(--text-secondary);">
-    <strong>Member since:</strong> Account #{{ user.id }}<br>
-    <strong>Tasks:</strong> {{ user.tasks|length }} total
+    <strong>User ID:</strong> #{{ user.id }}<br>
+<strong>Username:</strong> {{ user.username }}<br>
+<strong>Tasks:</strong> {{ user.tasks|length }} total
   </div>
 
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
 
     <div class="form-group">
-      {{ form.username.label }}
-      {{ form.username(class="form-control") }}
+      {{ form.username.label(class="form-label") }}
+  {{ form.username(class="form-control") }}
       {% if form.username.errors %}
         <span class="error">
           {% for error in form.username.errors %}<small>{{ error }}</small>{% endfor %}
