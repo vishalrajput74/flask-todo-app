@@ -24,7 +24,6 @@
 
           {% if 'user_id' in session %}
           <a href="{{ url_for('auth.profile') }}">Profile</a> 
-          <a href="{{ url_for('auth.change_password') }}">Change Password</a>
           
           <a href="{{ url_for('auth.logout') }}">Logout</a>
           {% else %}
