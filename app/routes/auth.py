@@ -1,3 +1,6 @@
+import requests
+import os
+
 from flask import Blueprint,render_template,redirect,request,url_for,flash,session,jsonify
 # from app import db
 from app.extensions import db
@@ -146,22 +149,74 @@ def profile():
 
     return render_template('profile.html', form=form, user=user)
 
+# @auth_bp.route('/forgot-password', methods=["GET", "POST"])
+# def forgot_password():
+#     # print(" forgot_password route hit") 
+#     form = ForgotPasswordForm()
+
+#     if form.validate_on_submit():
+#         print("validate form",form.email.data)
+
+#         user = User.query.filter_by(email=form.email.data).first()
+#         print(f"DEBUG: User found = {user}")            
+
+#  # TODO: rate limiting add karna hai — last_reset_request field + 2min check
+
+#         if user:
+#             print(" User email in DB ", user.email)       
+#             print(f"DEBUG: User username = {user.username}")    
+
+#             # Token banao
+#             s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+#             token = s.dumps(user.email, salt='password-reset')
+#             # print(f"DEBUG: Token generated = {token[:20]}...")
+
+#             # Reset link banao
+#             reset_url = url_for('auth.reset_password', token=token, _external=True)
+#             # print(f"DEBUG: Reset URL = {reset_url}") 
+            
+            
+#             # Terminal mein print karo (local testing)
+#             print("\n" + "="*60)
+#             print("PASSWORD RESET LINK (local testing):")
+#             print(reset_url)
+#             print("="*60 + "\n")
+
+#             # Email bhi bhejo (agar mail configured hai)
+#             try:
+#                 msg = Message(
+#                     subject="Password Reset Request",
+#                     recipients=[user.email]
+#                 )
+#                 msg.body = f"Reset your password using this link:\n\n{reset_url}\n\nLink expires in 10 minutes."
+#                 mail.send(msg)
+#                 print("Email sent successfully!")
+#             except Exception as e:
+#                 print(f"Email send failed (use terminal link): {e}")
+
+#         # Security: email exist kare ya na kare, same message dikhao
+#         flash('If that email exists, a reset link has been sent.', 'info')
+#         # print("DEBUG: Redirecting to login") 
+#         return redirect(url_for('auth.login'))
+    
+#     # print(f"DEBUG: Form errors = {form.errors}")                  
+#     return render_template('forgot_password.html', form=form)
 @auth_bp.route('/forgot-password', methods=["GET", "POST"])
 def forgot_password():
     # print(" forgot_password route hit") 
     form = ForgotPasswordForm()
 
     if form.validate_on_submit():
-        print("validate form",form.email.data)
+        print("validate form", form.email.data)
 
         user = User.query.filter_by(email=form.email.data).first()
-        print(f"DEBUG: User found = {user}")            
+        print(f"DEBUG: User found = {user}")
 
- # TODO: rate limiting add karna hai — last_reset_request field + 2min check
+        # TODO: rate limiting add karna hai — last_reset_request field + 2min check
 
         if user:
-            print(" User email in DB ", user.email)       
-            print(f"DEBUG: User username = {user.username}")    
+            print(" User email in DB ", user.email)
+            print(f"DEBUG: User username = {user.username}")
 
             # Token banao
             s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
@@ -170,35 +225,58 @@ def forgot_password():
 
             # Reset link banao
             reset_url = url_for('auth.reset_password', token=token, _external=True)
-            # print(f"DEBUG: Reset URL = {reset_url}") 
-            
-            
+            # print(f"DEBUG: Reset URL = {reset_url}")
+
             # Terminal mein print karo (local testing)
             print("\n" + "="*60)
             print("PASSWORD RESET LINK (local testing):")
             print(reset_url)
             print("="*60 + "\n")
 
-            # Email bhi bhejo (agar mail configured hai)
+            # Email bhejo
             try:
-                msg = Message(
-                    subject="Password Reset Request",
-                    recipients=[user.email]
-                )
-                msg.body = f"Reset your password using this link:\n\n{reset_url}\n\nLink expires in 10 minutes."
-                mail.send(msg)
-                print("Email sent successfully!")
+                sg_key = current_app.config.get('SENDGRID_API_KEY')
+
+                if sg_key:
+                    # Render pe → SendGrid HTTP API (port 443)
+                    response = requests.post(
+                        "https://api.sendgrid.com/v3/mail/send",
+                        headers={
+                            "Authorization": f"Bearer {sg_key}",
+                            "Content-Type": "application/json"
+                        },
+                        json={
+                            "personalizations": [{"to": [{"email": user.email}]}],
+                            "from": {"email": current_app.config['MAIL_DEFAULT_SENDER']},
+                            "subject": "Password Reset Request",
+                            "content": [{
+                                "type": "text/plain",
+                                "value": f"Reset your password:\n\n{reset_url}\n\nLink expires in 10 minutes."
+                            }]
+                        }
+                    )
+                    print(f"SendGrid HTTP API response: {response.status_code}")
+
+                else:
+                    # Local pe → Flask-Mail (Gmail SMTP)
+                    msg = Message(
+                        subject="Password Reset Request",
+                        recipients=[user.email]
+                    )
+                    msg.body = f"Reset your password using this link:\n\n{reset_url}\n\nLink expires in 10 minutes."
+                    mail.send(msg)
+                    print("Email sent via Flask-Mail!")
+
             except Exception as e:
                 print(f"Email send failed (use terminal link): {e}")
 
         # Security: email exist kare ya na kare, same message dikhao
         flash('If that email exists, a reset link has been sent.', 'info')
-        # print("DEBUG: Redirecting to login") 
+        # print("DEBUG: Redirecting to login")
         return redirect(url_for('auth.login'))
-    
-    # print(f"DEBUG: Form errors = {form.errors}")                  
-    return render_template('forgot_password.html', form=form)
 
+    # print(f"DEBUG: Form errors = {form.errors}")
+    return render_template('forgot_password.html', form=form)
 
 @auth_bp.route('/reset-password/<token>', methods=["GET", "POST"])
 def reset_password(token):
