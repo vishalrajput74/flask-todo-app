@@ -30,7 +30,7 @@ def create_app(): #factory function which is create flask app
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
     app.config["SESSION_PERMANENT"] = False 
     
-    SQLALCHEMY_ENGINE_OPTIONS = {
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "pool_pre_ping": True,
         "pool_recycle": 280,
     }
@@ -43,6 +43,8 @@ def create_app(): #factory function which is create flask app
     app.config["MAIL_PASSWORD"]       = os.environ.get("MAIL_PASSWORD")
     app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER")
     app.config["MAIL_USE_SSL"] = os.environ.get("MAIL_USE_SSL", "False") == "True"
+    app.config["SENDGRID_API_KEY"] = os.environ.get("SENDGRID_API_KEY")
+
     
     
     #Database ko app se connect kara
