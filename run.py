@@ -1,7 +1,9 @@
 from app.models import Task
 from app import create_app,db
 import os
+from dotenv import load_dotenv
 
+load_dotenv() 
 app=create_app()  #function call for app creation
 # print(app.config["SQLALCHEMY_DATABASE_URI"])
 # print("DB Path:", os.path.abspath('instance/todo.db'))

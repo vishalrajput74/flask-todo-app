@@ -2,7 +2,10 @@ from flask import Blueprint,render_template,redirect,request,url_for,flash,sessi
 # from app import db
 from app.extensions import db
 from app.models import User
-from app.forms import LoginForm, RegisterForm, ChangePasswordForm,ProfileForm
+from app.forms import LoginForm, RegisterForm, ChangePasswordForm,ProfileForm,ForgotPasswordForm, ResetPasswordForm
+from app.extensions import db, mail
+from flask_mail import Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 from flask import current_app
@@ -143,7 +146,97 @@ def profile():
 
     return render_template('profile.html', form=form, user=user)
 
+@auth_bp.route('/forgot-password', methods=["GET", "POST"])
+def forgot_password():
+    # print(" forgot_password route hit") 
+    form = ForgotPasswordForm()
 
+    if form.validate_on_submit():
+        print("validate form",form.email.data)
+
+        user = User.query.filter_by(email=form.email.data).first()
+        print(f"DEBUG: User found = {user}")            
+
+ # TODO: rate limiting add karna hai — last_reset_request field + 2min check
+
+        if user:
+            print(" User email in DB ", user.email)       
+            print(f"DEBUG: User username = {user.username}")    
+
+            # Token banao
+            s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+            token = s.dumps(user.email, salt='password-reset')
+            # print(f"DEBUG: Token generated = {token[:20]}...")
+
+            # Reset link banao
+            reset_url = url_for('auth.reset_password', token=token, _external=True)
+            # print(f"DEBUG: Reset URL = {reset_url}") 
+            
+            
+            # Terminal mein print karo (local testing)
+            print("\n" + "="*60)
+            print("PASSWORD RESET LINK (local testing):")
+            print(reset_url)
+            print("="*60 + "\n")
+
+            # Email bhi bhejo (agar mail configured hai)
+            try:
+                msg = Message(
+                    subject="Password Reset Request",
+                    recipients=[user.email]
+                )
+                msg.body = f"Reset your password using this link:\n\n{reset_url}\n\nLink expires in 10 minutes."
+                mail.send(msg)
+                print("Email sent successfully!")
+            except Exception as e:
+                print(f"Email send failed (use terminal link): {e}")
+
+        # Security: email exist kare ya na kare, same message dikhao
+        flash('If that email exists, a reset link has been sent.', 'info')
+        # print("DEBUG: Redirecting to login") 
+        return redirect(url_for('auth.login'))
+    
+    # print(f"DEBUG: Form errors = {form.errors}")                  
+    return render_template('forgot_password.html', form=form)
+
+
+@auth_bp.route('/reset-password/<token>', methods=["GET", "POST"])
+def reset_password(token):
+    # print("reset route hit")
+    # print("token recieved",token)
+    # Token verify karo
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try:
+        email = s.loads(token, salt='password-reset', max_age=600)# 10 min
+        # print("decode emial",email)
+    except SignatureExpired: #5 second time duration test
+        print("token expired")
+        flash('Reset link has expired. Please request a new one.', 'error')
+        return redirect(url_for('auth.forgot_password'))
+    except BadSignature: #token change reset link like hello world garbage token 
+        print("token invalid")
+        flash('Invalid reset link.', 'error')
+        return redirect(url_for('auth.forgot_password'))
+
+    form = ResetPasswordForm()
+
+    if form.validate_on_submit():
+        # print("form validate")
+        # print("user email",email)
+        user = User.query.filter_by(email=email).first()
+        # print("user found ",user)
+        if user:
+            # print("old hash",user.password)
+
+            user.password = generate_password_hash(form.password.data)
+            db.session.commit()
+            # print("new hash",user.password)
+            print("store in db")
+
+            flash('Password reset successful! Please login.', 'success')
+            return redirect(url_for('auth.login'))
+
+    return render_template('reset_password.html', form=form)
 
 
 
