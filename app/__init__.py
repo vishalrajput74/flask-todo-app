@@ -30,6 +30,11 @@ def create_app(): #factory function which is create flask app
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
     app.config["SESSION_PERMANENT"] = False 
     
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+    }
+    
       # ── Flask-Mail (local: sirf print karega terminal mein) ──
     app.config["MAIL_SERVER"]         = os.environ.get("MAIL_SERVER", "sandbox.smtp.mailtrap.io")
     app.config["MAIL_PORT"]           = int(os.environ.get("MAIL_PORT", 2525))
