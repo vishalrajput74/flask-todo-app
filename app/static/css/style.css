@@ -532,7 +532,42 @@ footer p { margin: 0; }
 
   .filter-search-bar { flex-direction: column; align-items: stretch; }
   .search-input { min-width: unset; width: 100%; }
+  
+
+  /* Header fix */
+  header .container {
+    padding: 10px 16px;
+  }
+
+  header h1 {
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  nav a, .nav-user {
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  /* Stats — 3 columns mobile pe */
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Export CSV button neeche */
+  .task-box-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Task box padding kam karo */
+  .task-box {
+    padding: 16px;
+    margin: 16px auto;
+  }
 }
+
 
 .nav-user {
   color: rgba(255,255,255,.85);
