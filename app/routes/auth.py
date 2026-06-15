@@ -304,11 +304,11 @@ def reset_password(token):
         user = User.query.filter_by(email=email).first()
         # print("user found ",user)
         if user:
-            # print("old hash",user.password)
+            print("old hash",user.password)
 
             user.password = generate_password_hash(form.password.data)
             db.session.commit()
-            # print("new hash",user.password)
+            print("new hash",user.password)
             print("store in db")
 
             flash('Password reset successful! Please login.', 'success')
