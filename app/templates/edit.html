@@ -29,6 +29,8 @@ content %}
       value="{{ request.args.get('per_page', 5) }}"
     />
     <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
+    <input type="hidden" name="sort_by" value="{{ request.args.get('sort_by', 'id') }}">
+    <input type="hidden" name="sort_order" value="{{ request.args.get('sort_order', 'desc') }}">
     <div class="form-group">
       {{ form.title.label }} {{ form.title(class="form-control") }} {% if
       form.title.errors %}
@@ -47,7 +49,9 @@ content %}
     <div style="display: flex; gap: 8px; margin-top: 8px">
       {{ form.submit(class="btn") }}
       <a
-        href="{{ url_for('tasks.view_tasks',page=request.args.get('page', 1),status=request.args.get('status', 'All'),search=request.args.get('search', ''),per_page=request.args.get('per_page', 5),priority=request.args.get('priority', 'All')) }}"
+        href="{{ url_for('tasks.view_tasks',page=request.args.get('page', 1),status=request.args.get('status', 'All'),search=request.args.get('search', ''),per_page=request.args.get('per_page', 5),priority=request.args.get('priority', 'All'),
+    sort_by=request.args.get('sort_by', 'id'),
+    sort_order=request.args.get('sort_order', 'desc')) }}"
         class="btn"
         >Cancel</a
       >
