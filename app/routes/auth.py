@@ -72,7 +72,7 @@ def register():
         new_user = User(
             username=form.username.data,
             password=hashed_password,
-            email=form.email.data or None
+            email=form.email.data
 
             # password=form.password.data  
         )
@@ -133,7 +133,7 @@ def profile():
 
     if form.validate_on_submit():
         user.username = form.username.data
-        user.email = form.email.data or None
+        user.email = form.email.data
         db.session.commit()
 
         # Session update karo — navbar mein naya naam dikhega

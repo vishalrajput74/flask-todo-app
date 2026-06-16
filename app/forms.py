@@ -101,7 +101,7 @@ class ProfileForm(FlaskForm):
         Length(min=3, max=20)
     ])
     email = StringField('Email', validators=[
-        Optional(),
+        DataRequired(),
         Email(message='Please enter a valid email')
     ])
     submit = SubmitField('Update Profile')
