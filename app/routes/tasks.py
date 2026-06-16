@@ -27,8 +27,10 @@ def get_redirect_params():
     priority = request.form.get('priority', request.args.get('priority', 'All'))  # ADD
     
     per_page = request.form.get('per_page') or request.args.get('per_page', 5)
-    sort_by = request.args.get('sort_by', 'id')     
-    sort_order = request.args.get('sort_order', 'desc') 
+    sort_by = request.form.get('sort_by') or request.args.get('sort_by', 'id')
+    sort_order = request.form.get('sort_order') or request.args.get('sort_order', 'desc')
+    # sort_by = request.args.get('sort_by', 'id')     
+    # sort_order = request.args.get('sort_order', 'desc') 
     return dict(page=page, status=status, search=search, per_page=per_page,priority=priority,sort_by=sort_by,sort_order=sort_order)
 
 
