@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>{% block title %}To-Do App {% endblock %}</title>
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap"
@@ -18,13 +20,11 @@
         <h1>My To-Do App</h1>
         <nav>
           <a href="{{ url_for('tasks.view_tasks') }}">Home</a>
-            {% if 'user_id' in session %}
-          <span class="nav-user">👤 {{ session.get('username', 'User') }}</span> 
-          {% endif %}
-
           {% if 'user_id' in session %}
-          <a href="{{ url_for('auth.profile') }}">Profile</a> 
-          
+          <span class="nav-user">👤 {{ session.get('username', 'User') }}</span>
+          {% endif %} {% if 'user_id' in session %}
+          <a href="{{ url_for('auth.profile') }}">Profile</a>
+
           <a href="{{ url_for('auth.logout') }}">Logout</a>
           {% else %}
           <a href="{{ url_for('auth.login') }}">Login</a>
@@ -46,10 +46,10 @@
       </div>
     </footer>
     <script>
-function togglePassword(fieldName) {
-  const input = document.getElementById(fieldName);
-  input.type = input.type === 'password' ? 'text' : 'password';
-}
-</script>
+      function togglePassword(fieldName) {
+        const input = document.getElementById(fieldName);
+        input.type = input.type === "password" ? "text" : "password";
+      }
+    </script>
   </body>
 </html>
