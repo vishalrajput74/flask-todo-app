@@ -130,6 +130,8 @@
   <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
   <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
   <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
+  <input type="hidden" name="sort_by" value="{{ request.args.get('sort_by', 'id') }}">
+<input type="hidden" name="sort_order" value="{{ request.args.get('sort_order', 'desc') }}">
 </form>
 
   <table class="tasks-table">
@@ -235,7 +237,9 @@
 
         <!-- CHANGE: data-label="Edit" — edit button column -->
         <td data-label="Edit">
-          <a href="{{ url_for('tasks.edit_task',task_id=task.id,page=request.args.get('page', 1),status=request.args.get('status', 'All'),search=request.args.get('search', ''),per_page=request.args.get('per_page', 5),priority=request.args.get('priority', 'All')) }}"
+          <a href="{{ url_for('tasks.edit_task',task_id=task.id,page=request.args.get('page', 1),status=request.args.get('status', 'All'),search=request.args.get('search', ''),per_page=request.args.get('per_page', 5),priority=request.args.get('priority', 'All'),
+    sort_by=request.args.get('sort_by', 'id'),
+    sort_order=request.args.get('sort_order', 'desc')) }}"
             class="btn-small">Edit</a>
         </td>
 

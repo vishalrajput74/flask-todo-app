@@ -138,6 +138,7 @@ today=date.today(),priority=priority,stats=stats)
 @tasks_bp.route('/add', methods=["POST"])
 @login_required 
 def add_task():
+    # print("FORM DATA:", request.form.to_dict())
     # print("add task route hit")
     # print("session",dict(session))
     # if 'user_id' not in session:
