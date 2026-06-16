@@ -1,7 +1,7 @@
 from datetime import date
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField,TextAreaField
 from wtforms.fields import DateField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError,Optional,Email
 from app.models import User
@@ -57,6 +57,10 @@ class TaskForm(FlaskForm):
         DataRequired(),
         Length(min=3, max=100, message='Task must be between 3 and 100 characters')
     ])
+    description = TextAreaField('Description', validators=[
+        Optional(),
+        Length(max=1000, message='Description cannot exceed 1000 characters')
+    ])
     due_date = DateField('Due Date', format='%Y-%m-%d', validators=[Optional(),validate_future_date])
     submit = SubmitField('Add Task')
 
@@ -64,6 +68,10 @@ class EditTaskForm(FlaskForm):
     title = StringField('Task Title', validators=[
         DataRequired(),
         Length(min=3, max=100, message='Task must be between 3 and 100 characters')
+    ])
+    description = TextAreaField('Description', validators=[
+        Optional(),
+        Length(max=1000, message='Description cannot exceed 1000 characters')
     ])
     due_date = DateField('Due Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Update')

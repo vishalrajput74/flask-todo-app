@@ -148,11 +148,11 @@ def add_task():
     form = TaskForm()
     
     if form.validate_on_submit():
-        # print("form valid")
+        print("form valid")
         # print("title",form.title.data)
         priority = calculate_priority(form.due_date.data)
         # print(f"Priority calculated: {priority}")
-        new_task = Task(title=form.title.data,due_date=form.due_date.data,status='Pending',user_id=session['user_id'], priority=priority )
+        new_task = Task(title=form.title.data,due_date=form.due_date.data,status='Pending',user_id=session['user_id'], priority=priority, description=form.description.data or None )
         db.session.add(new_task)
         db.session.commit()
         # print(f"Task saved with priority: {new_task.priority}")
@@ -160,7 +160,7 @@ def add_task():
         # print("task saved with id",new_task.id)
         flash('Task added successfully!', 'success')
     else:
-        # print("form.errors")
+        print("Errors",form.errors)
         for field, errors in form.errors.items():
             for error in errors:
                 flash(f'{field}: {error}', 'error')
@@ -246,6 +246,7 @@ def edit_task(task_id):
                 return render_template('edit.html', task=task, form=form)
         
         task.title = form.title.data
+        task.description = form.description.data or None
         task.due_date = form.due_date.data
         task.priority = calculate_priority(form.due_date.data)
         # print(f"Priority updated to: {task.priority}") 
@@ -256,6 +257,7 @@ def edit_task(task_id):
 
     elif request.method == "GET":
         form.title.data = task.title
+        form.description.data = task.description
         form.due_date.data = task.due_date
     return render_template('edit.html', task=task, form=form)
 

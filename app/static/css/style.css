@@ -394,7 +394,7 @@ footer p {
 .tasks-table td {
   padding: 11px 12px;
   border-bottom: 1px solid #f1f5f9;
-  vertical-align: middle;
+  vertical-align: top;
   font-size: 13px;
   color: var(--text-primary);
 }
@@ -615,6 +615,71 @@ footer p {
   border-color: var(--blue-dark) !important;
 }
 
+/* ── Task Description (details/summary) ── */
+.task-desc-details {
+  margin-top: 4px;
+}
+
+.task-desc-summary {
+  font-size: 11px;
+  color: var(--blue-mid); /* tera existing blue variable */
+  cursor: pointer;
+  list-style: none; /* default triangle remove */
+  display: inline-block;
+  font-weight: 500;
+  padding: 1px 0;
+}
+
+.task-desc-summary:hover {
+  text-decoration: underline;
+}
+
+/* default browser marker hide */
+.task-desc-summary::-webkit-details-marker {
+  display: none;
+}
+
+.task-desc-text {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-secondary); /* tera existing variable */
+  line-height: 1.6;
+  background: var(--blue-light); /* light blue background */
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--blue-mid);
+  white-space: pre-wrap; /* newlines preserve honge */
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+/* Textarea in forms */
+.task-desc-textarea {
+  resize: vertical; /* sirf height resize ho */
+  min-height: 80px;
+  font-family: "DM Sans", sans-serif; /* tera font */
+  line-height: 1.6;
+}
+/* ── Column wrap fix ── */
+.tasks-table td:nth-child(4),
+.tasks-table td:nth-child(5),
+.tasks-table td:nth-child(6) {
+  white-space: nowrap;
+}
+.tasks-table th:nth-child(4) {
+  white-space: nowrap;
+}
+.tasks-table td:nth-child(3),
+.tasks-table th:nth-child(3) {
+    width: 280px;
+    max-width: 280px;
+    word-wrap: break-word;
+}
+.desc-preview {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 11px;
+}
 @media (max-width: 640px) {
   .tasks-table thead {
     display: none;
