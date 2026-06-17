@@ -236,6 +236,8 @@ def forgot_password():
             # Email bhejo
             try:
                 sg_key = current_app.config.get('SENDGRID_API_KEY')
+                print(f"DEBUG API KEY: '{sg_key[:15] if sg_key else 'EMPTY/NONE'}'")  # ← ADD KARO
+
 
                 if sg_key:
                     # Render pe → SendGrid HTTP API (port 443)
