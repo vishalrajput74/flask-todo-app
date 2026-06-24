@@ -24,8 +24,7 @@ def get_redirect_params():
         page = 1
     status = request.form.get('status', request.args.get('status', 'All'))
     search = request.form.get('search', request.args.get('search', ''))
-    priority = request.form.get('priority', request.args.get('priority', 'All'))  # ADD
-    
+    priority = request.form.get('priority', request.args.get('priority', 'All'))
     per_page = request.form.get('per_page') or request.args.get('per_page', 5)
     sort_by = request.form.get('sort_by') or request.args.get('sort_by', 'id')
     sort_order = request.form.get('sort_order') or request.args.get('sort_order', 'desc')
@@ -47,8 +46,8 @@ def calculate_priority(due_date):
 @tasks_bp.route('/')
 @login_required 
 def view_tasks():
-    # print("view task route hit")
-    # print("session ", dict(session), flush=True)
+    print("view task route hit")
+    print("session ", dict(session), flush=True)
     # if 'user_id' not in session:
         # print("user not loged in")
         # return redirect(url_for('auth.login'))
@@ -95,6 +94,24 @@ def view_tasks():
             order = Task.due_date.desc().nulls_last()
     else:
         order = Task.id.desc()
+    
+      
+    # Priority auto-refresh
+    # paginate se PEHLE saare filtered tasks
+    # fetch karo aur priority recalculate karo
+    all_filtered_tasks = query.all()
+
+    stale_found = False
+    for task in all_filtered_tasks:
+        fresh_priority = calculate_priority(task.due_date)
+        if task.priority != fresh_priority:
+            task.priority = fresh_priority
+            stale_found = True
+
+    if stale_found:
+        db.session.commit()
+   
+   
     pagination = query.order_by(order).paginate(
         page=page,
         per_page=per_page,
@@ -138,8 +155,8 @@ today=date.today(),priority=priority,stats=stats)
 @tasks_bp.route('/add', methods=["POST"])
 @login_required 
 def add_task():
-    # print("FORM DATA:", request.form.to_dict())
-    # print("add task route hit")
+    print("add task route hit")
+    print("FORM DATA:", request.form.to_dict())
     # print("session",dict(session))
     # if 'user_id' not in session:
         # print("not logged in ")
@@ -160,7 +177,7 @@ def add_task():
         # print("task saved with id",new_task.id)
         flash('Task added successfully!', 'success')
     else:
-        print("Errors",form.errors)
+        # print("Errors",form.errors)
         for field, errors in form.errors.items():
             for error in errors:
                 flash(f'{field}: {error}', 'error')

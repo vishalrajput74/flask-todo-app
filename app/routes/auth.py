@@ -60,14 +60,11 @@ def login():
 def register():
     # print("Register route hit")
     form = RegisterForm()
-   
-    
     if form.validate_on_submit():
         # print("form valid")
         # print("username",form.username.data)
-        
         hashed_password = generate_password_hash(form.password.data)
-
+        # print("hash",hashed_password)
         # Create new user
         new_user = User(
             username=form.username.data,
@@ -105,20 +102,28 @@ def logout():
 @auth_bp.route('/change-password', methods=["GET", "POST"])
 @login_required 
 def change_password():
+    # print("Change Pass Route Hit")
     # if 'user_id' not in session:
     #     flash('Please login first', 'error')
     #     return redirect(url_for('auth.login'))
 
     form = ChangePasswordForm()
+    # print("data",form.data)
 
     if form.validate_on_submit():
+        # print("form valid")
+        # print("data",form.data)
+
         user = db.session.get(User, session['user_id'])
+        # print("user found",user)
 
         if not user or not check_password_hash(user.password, form.current_password.data):
             flash('Current password is incorrect!', 'error')
             return redirect(url_for('auth.change_password'))
-
+        # print("old hash",user.password)
         user.password = generate_password_hash(form.new_password.data)
+        # print("new hash",user.password)
+        # print("new pass",form.new_password.data)
         db.session.commit()
         flash('Password changed successfully!', 'success')
         return redirect(url_for('tasks.view_tasks'))
@@ -128,16 +133,30 @@ def change_password():
 @auth_bp.route('/profile', methods=["GET", "POST"])
 @login_required
 def profile():
+    # print("Profile Route Hit")
     user = db.session.get(User, session['user_id'])
+    # print("user",user)
     form = ProfileForm(current_user_id=user.id)
-
+    # print("data",form.data)
     if form.validate_on_submit():
+        # print("form valid")
+        # print("new data",form.data)
+        # print("before change user name",user.username)
+
         user.username = form.username.data
+        # print("user name",user.username)
+        # print("form user name ",form.username.data)
+        # print("Before change Email",user.email)
         user.email = form.email.data
+        # print("User Email",user.email)
+        # print("User email",form.email.data)
         db.session.commit()
 
         # Session update karo — navbar mein naya naam dikhega
+        # print(" session ussername", dict(session))
+
         session['username'] = user.username
+        # print("ussername", user.username)
 
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('auth.profile'))
@@ -205,18 +224,22 @@ def profile():
 def forgot_password():
     # print(" forgot_password route hit") 
     form = ForgotPasswordForm()
+    # print("session",dict(session))
 
     if form.validate_on_submit():
-        print("validate form", form.email.data)
+        # print("form valid")
+        # print("validate form", form.email.data)
+        # print("session",dict(session))
+
 
         user = User.query.filter_by(email=form.email.data).first()
-        print(f"DEBUG: User found = {user}")
+        # print(f"DEBUG: User found = {user}")
 
         # TODO: rate limiting add karna hai — last_reset_request field + 2min check
 
         if user:
-            print(" User email in DB ", user.email)
-            print(f"DEBUG: User username = {user.username}")
+            # print(" User email in DB ", user.email)
+            # print(f"DEBUG: User username = {user.username}")
 
             # Token banao
             s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
@@ -228,15 +251,15 @@ def forgot_password():
             # print(f"DEBUG: Reset URL = {reset_url}")
 
             # Terminal mein print karo (local testing)
-            print("\n" + "="*60)
-            print("PASSWORD RESET LINK (local testing):")
-            print(reset_url)
-            print("="*60 + "\n")
+            # print("\n" + "="*60)
+            # print("PASSWORD RESET LINK (local testing):")
+            # print(reset_url)
+            # print("="*60 + "\n")
 
             # Email bhejo
             try:
                 sg_key = current_app.config.get('SENDGRID_API_KEY')
-                print(f"DEBUG API KEY: '{sg_key[:15] if sg_key else 'EMPTY/NONE'}'")  # ← ADD KARO
+                # print(f"DEBUG API KEY: '{sg_key[:15] if sg_key else 'EMPTY/NONE'}'")  
 
 
                 if sg_key:
@@ -267,7 +290,7 @@ def forgot_password():
                     )
                     msg.body = f"Reset your password using this link:\n\n{reset_url}\n\nLink expires in 10 minutes."
                     mail.send(msg)
-                    print("Email sent via Flask-Mail!")
+                    # print("Email sent via Flask-Mail!")
 
             except Exception as e:
                 print(f"Email send failed (use terminal link): {e}")
@@ -286,19 +309,21 @@ def reset_password(token):
     # print("token recieved",token)
     # Token verify karo
     s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    # print("key",s)
     try:
         email = s.loads(token, salt='password-reset', max_age=600)# 10 min
-        # print("decode emial",email)
-    except SignatureExpired: #5 second time duration test
-        print("token expired")
+        # print("decode email",email)
+    except SignatureExpired: # 10 mini time duration test
+        # print("token expired")
         flash('Reset link has expired. Please request a new one.', 'error')
         return redirect(url_for('auth.forgot_password'))
     except BadSignature: #token change reset link like hello world garbage token 
-        print("token invalid")
+        # print("token invalid")
         flash('Invalid reset link.', 'error')
         return redirect(url_for('auth.forgot_password'))
 
     form = ResetPasswordForm()
+    # print("form",dict(session))
 
     if form.validate_on_submit():
         # print("form validate")
@@ -306,12 +331,13 @@ def reset_password(token):
         user = User.query.filter_by(email=email).first()
         # print("user found ",user)
         if user:
-            print("old hash",user.password)
-
+            # print("old hash",user.password)
+            # print(" user password", user.password)
             user.password = generate_password_hash(form.password.data)
+            # print("form data",form.password.data)
             db.session.commit()
-            print("new hash",user.password)
-            print("store in db")
+            # print("new hash",user.password)
+            # print("store in db")
 
             flash('Password reset successful! Please login.', 'success')
             return redirect(url_for('auth.login'))
