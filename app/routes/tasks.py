@@ -103,6 +103,15 @@ def view_tasks():
 
     stale_found = False
     for task in all_filtered_tasks:
+        
+     # Done tasks ki priority None karo
+        if task.status == 'Done':
+            if task.priority is not None:    # sirf tab jab priority set ho
+                task.priority = None
+                stale_found = True
+            continue
+        
+        # Pending/Working tasks recalculate karo
         fresh_priority = calculate_priority(task.due_date)
         if task.priority != fresh_priority:
             task.priority = fresh_priority
