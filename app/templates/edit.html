@@ -7,27 +7,11 @@ content %}
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
     <!-- preserve pagination/filter/search when submitting edit -->
-    <input
-      type="hidden"
-      name="page"
-      value="{{ request.args.get('page', 1) }}"
-    />
-    <input
-      type="hidden"
-      name="status"
-      value="{{ request.args.get('status', 'All') }}"
-    />
-    <input
-      type="hidden"
-      name="search"
-      value="{{ request.args.get('search', '') }}"
-    />
+    <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}"/>
+    <input type="hidden" name="status" value="{{ request.args.get('status', 'All') }}"/>
+    <input type="hidden" name="search" value="{{ request.args.get('search', '') }}"/>
     <!-- preserve per_page so edit submit returns to same page-size view -->
-    <input
-      type="hidden"
-      name="per_page"
-      value="{{ request.args.get('per_page', 5) }}"
-    />
+    <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}"/>
     <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
     <input type="hidden" name="sort_by" value="{{ request.args.get('sort_by', 'id') }}">
     <input type="hidden" name="sort_order" value="{{ request.args.get('sort_order', 'desc') }}">
@@ -42,8 +26,6 @@ content %}
       {% endif %}
     </div>
 
-
-     <!-- Title field ke baad, due_date se pehle add karo -->
 <div class="form-group">
     {{ form.description.label }}
     {{ form.description(

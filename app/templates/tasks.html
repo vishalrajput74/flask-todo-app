@@ -42,17 +42,10 @@
     <option value="Done" {% if request.args.get('status')=='Done' %}selected{% endif %}>Done</option>
   </select>
   
-  <!-- reset to first page on new search -->
   <input type="hidden" name="page" value="1">
-  <!-- preserve other filters -->
   <input type="hidden" name="per_page" value="{{ request.args.get('per_page', 5) }}">
   <input type="hidden" name="priority" value="{{ request.args.get('priority', 'All') }}">
-  <input 
-    type="text" 
-    name="search" 
-    placeholder="Search tasks..."
-    value="{{ request.args.get('search','') }}"
-    class="search-input">
+  <input type="text" name="search" placeholder="Search tasks..." value="{{ request.args.get('search','') }}" class="search-input">
 
   <button type="submit" class="btn-small">Search</button>
 
@@ -107,11 +100,7 @@
   </form>
 
   {% if tasks %}
-  <form
-    method="POST"
-    action="{{ url_for('tasks.clear_tasks') }}"
-    style="display: inline"
-  >
+  <form method="POST" action="{{ url_for('tasks.clear_tasks') }}" style="display: inline">
   {{ clear_form.hidden_tag() }}
   {% set active_status = request.args.get('status', 'All') %}
 
@@ -317,7 +306,9 @@
   <ul class="pagination">
     {% if pagination.has_prev %}
       <li class="page-item">
-        <a class="page-link" href="{{ url_for('tasks.view_tasks', page=pagination.prev_num, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All')) }}">Previous</a>
+        <a class="page-link" href="{{ url_for('tasks.view_tasks', page=pagination.prev_num, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All'),
+      sort_by=request.args.get('sort_by','id'),
+      sort_order=request.args.get('sort_order','desc')) }}">Previous</a>
       </li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">Previous</span></li>
@@ -328,14 +319,18 @@
         <li class="page-item active"><span class="page-link">{{ p }}</span></li>
       {% else %}
         <li class="page-item">
-          <a class="page-link" href="{{ url_for('tasks.view_tasks', page=p, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All')) }}">{{ p }}</a>
+          <a class="page-link" href="{{ url_for('tasks.view_tasks', page=p, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All'),
+      sort_by=request.args.get('sort_by','id'),
+      sort_order=request.args.get('sort_order','desc')) }}">{{ p }}</a>
         </li>
       {% endif %}
     {% endfor %}
 
     {% if pagination.has_next %}
       <li class="page-item">
-        <a class="page-link" href="{{ url_for('tasks.view_tasks', page=pagination.next_num, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All')) }}">Next</a>
+        <a class="page-link" href="{{ url_for('tasks.view_tasks', page=pagination.next_num, status=request.args.get('status','All'), search=request.args.get('search',''), per_page=request.args.get('per_page', 5), priority=request.args.get('priority','All'),
+      sort_by=request.args.get('sort_by','id'),
+      sort_order=request.args.get('sort_order','desc')) }}">Next</a>
       </li>
     {% else %}
       <li class="page-item disabled"><span class="page-link">Next</span></li>

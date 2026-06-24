@@ -9,7 +9,7 @@ from app.extensions import db
 from app.models import Task
 from app.forms import TaskForm, EditTaskForm, UpdateStatusForm, DeleteTaskForm, ClearTasksForm, BulkActionForm 
 from datetime import date
-from sqlalchemy import nulls_last
+from sqlalchemy import or_
 from app.utils import login_required
 
 #create blueprint
@@ -77,7 +77,12 @@ def view_tasks():
         
     if search and search.strip():
         s = search.strip()
-        query = query.filter(Task.title.ilike(f"%{s}%"))
+        query = query.filter(
+        or_(
+            Task.title.ilike(f"%{s}%"),
+            Task.description.ilike(f"%{s}%")
+        )
+    )
         
     if priority and priority != 'All':
         if priority == 'None':
@@ -164,17 +169,18 @@ today=date.today(),priority=priority,stats=stats)
 @tasks_bp.route('/add', methods=["POST"])
 @login_required 
 def add_task():
-    print("add task route hit")
-    print("FORM DATA:", request.form.to_dict())
+    # print("add task route hit")
+    # print("FORM DATA:", request.form.to_dict())
     # print("session",dict(session))
     # if 'user_id' not in session:
         # print("not logged in ")
         # return redirect(url_for('auth.login'))
     
     form = TaskForm()
+    # print("Form is created but not valdiate ")
     
     if form.validate_on_submit():
-        print("form valid")
+        # print("form validate ")
         # print("title",form.title.data)
         priority = calculate_priority(form.due_date.data)
         # print(f"Priority calculated: {priority}")
@@ -228,11 +234,16 @@ def update_status(task_id):
 @tasks_bp.route('/clear', methods=["POST"])
 @login_required 
 def clear_tasks():
+    # print("clear tasks route hit")
+    # print("FORM DATA:", request.form.to_dict())
+    # print("SESSION user_id:", session.get('user_id'))
+
     # if 'user_id' not in session:
     #     flash("Please login first", "error")
     #     return redirect(url_for('auth.login'))
     
-    form = ClearTasksForm() # validation
+    form = ClearTasksForm()
+    # print("form created but not validate")
     
     if not form.validate_on_submit():  
         flash("CSRF validation failed", "error")
@@ -242,10 +253,22 @@ def clear_tasks():
     
     # deleted_count = Task.query.filter_by(user_id=session['user_id']).delete(synchronize_session=False)
     status = request.form.get('status', 'All')
+    # print(f"Status filter received: '{status}'")
     query = Task.query.filter_by(user_id=session['user_id'])
+    # print(f"Base query — user_id={session['user_id']}")
+
     if status and status != 'All':
         query = query.filter_by(status=status)
+        
+    priority = request.form.get('priority', 'All')
+    if priority and priority != 'All':
+        if priority == 'None':
+            query = query.filter(Task.priority == None)
+        else:
+            query = query.filter_by(priority=priority)
+            
     deleted_count = query.delete(synchronize_session=False)
+    # print("deleted count ", deleted_count)
     db.session.commit()
     flash(f'{deleted_count} task(s) cleared!', 'info')
     return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
@@ -254,26 +277,34 @@ def clear_tasks():
 @tasks_bp.route('/edit/<int:task_id>', methods=["GET", "POST"])
 @login_required 
 def edit_task(task_id):
+    # print("Edit task route Hit")
     # task = Task.query.get(task_id)
     # if 'user_id' not in session:
     #     return redirect(url_for('auth.login'))
     task = Task.query.filter_by(id=task_id,user_id=session['user_id']).first()
+    # print("task",task)
+    # print(session,dict(session))
     if not task:
         flash("Task not found", "error")
         return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
     
     form = EditTaskForm()
+    # print("form created but not validate")
     
     if form.validate_on_submit():
-        # ← sirf yahan change hai
+        # print("form validate")
         if form.due_date.data and form.due_date.data < date.today():
             if form.due_date.data != task.due_date:
                 flash('Due date cannot be in the past.', 'error')
                 return render_template('edit.html', task=task, form=form)
         
+        # print("task title",task.title)
         task.title = form.title.data
+        # print("form title ",form.title.data)
         task.description = form.description.data or None
+        # print("task due date",task.due_date)
         task.due_date = form.due_date.data
+        # print("form due date",form.due_date.data)
         task.priority = calculate_priority(form.due_date.data)
         # print(f"Priority updated to: {task.priority}") 
 
@@ -290,17 +321,19 @@ def edit_task(task_id):
 @tasks_bp.route('/delete/<int:task_id>', methods=["POST"])
 @login_required 
 def delete_task(task_id):
+    # print("delete route hit")
     # if 'user_id' not in session:
     #    flash("Please login first", "error")
     #    return redirect(url_for('auth.login'))
     
-    form = DeleteTaskForm()  # validation
+    form = DeleteTaskForm() 
     
     if not form.validate_on_submit():  
         flash("CSRF validation failed", "error")
         return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
     task = Task.query.filter_by(id=task_id, user_id=session['user_id']).first()
+    # print("task",task)
     
     if not task:
         flash("Task not found!", "error")
@@ -314,18 +347,24 @@ def delete_task(task_id):
 @tasks_bp.route('/bulk-action', methods=["POST"])
 @login_required 
 def bulk_action():
+    # print("bulk action route hit")
+    # print("FORM DATA:", request.form.to_dict())
+    # print("SESSION user_id:", session.get('user_id'))
     # if 'user_id' not in session:
     #     flash("Please login first", "error")
     #     return redirect(url_for('auth.login'))
 
     form = BulkActionForm()
+    # print("form is created but not validate ")
 
     if not form.validate_on_submit():
         flash("CSRF validation failed", "error")
         return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
     task_ids = request.form.getlist('task_ids')
+    # print("task list",task_ids)
     action = request.form.get('action')
+    # print("action", action)
 
     if not task_ids:
         flash("No tasks selected!", "info")
@@ -337,10 +376,7 @@ def bulk_action():
         flash("Invalid task selection", "error")
         return redirect(url_for('tasks.view_tasks', **get_redirect_params()))
 
-    tasks = Task.query.filter(
-        Task.id.in_(task_ids),
-        Task.user_id == session['user_id']
-    ).all()
+    tasks = Task.query.filter(Task.id.in_(task_ids),Task.user_id == session['user_id']).all()
 
     if not tasks:
         flash("No matching tasks found!", "info")
@@ -372,10 +408,12 @@ def bulk_action():
 @tasks_bp.route('/export-csv')
 @login_required 
 def export_csv():
+    print("export route hit")
     # if 'user_id' not in session:
     #     return redirect(url_for('auth.login'))
 
     query = Task.query.filter_by(user_id=session['user_id'])
+    print("task",tasks)
     
     status = request.args.get('status', 'All')
     search = request.args.get('search', '')
@@ -404,11 +442,12 @@ def export_csv():
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['Title', 'Due Date', 'Priority', 'Status'])
+    writer.writerow(['Title', 'Description', 'Due Date', 'Priority', 'Status'])
 
     for task in tasks:
         writer.writerow([
             task.title,
+            task.description or '',
             task.due_date or '',
             task.priority or '',
             task.status
