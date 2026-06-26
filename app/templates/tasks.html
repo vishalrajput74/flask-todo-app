@@ -103,11 +103,29 @@
   <form method="POST" action="{{ url_for('tasks.clear_tasks') }}" style="display: inline">
   {{ clear_form.hidden_tag() }}
   {% set active_status = request.args.get('status', 'All') %}
+{% set active_priority = request.args.get('priority', 'All') %}
+{% set active_search = request.args.get('search', '') %}
+
+{% if active_status == 'All' and active_priority == 'All' and not active_search %}
+    {% set btn_label = 'Clear All Tasks' %}
+{% else %}
+    {% set parts = [] %}
+    {% if active_search %}
+        {% set _ = parts.append('"' + active_search + '"') %}
+    {% endif %}
+    {% if active_status != 'All' %}
+        {% set _ = parts.append(active_status) %}
+    {% endif %}
+    {% if active_priority != 'All' %}
+        {% set _ = parts.append(active_priority + ' Priority') %}
+    {% endif %}
+    {% set btn_label = 'Clear ' + parts | join(' + ') + ' Tasks' %}
+{% endif %}
 
 {{ clear_form.submit(
     class="btn btn-clear btn-reset",
-    value="Clear " + (active_status if active_status != 'All' else 'All') + " Tasks",
-    onclick="return confirm('Clear " + (active_status if active_status != 'All' else 'all') + " tasks?')") 
+    value=btn_label,
+    onclick="return confirm('Are you sure? " + btn_label + "?')")
 }}
     <!-- preserve current page/status/search across POST -->
     <input type="hidden" name="page" value="{{ request.args.get('page', 1) }}">

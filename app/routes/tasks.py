@@ -46,8 +46,8 @@ def calculate_priority(due_date):
 @tasks_bp.route('/')
 @login_required 
 def view_tasks():
-    print("view task route hit")
-    print("session ", dict(session), flush=True)
+    # print("view task route hit")
+    # print("session ", dict(session), flush=True)
     # if 'user_id' not in session:
         # print("user not loged in")
         # return redirect(url_for('auth.login'))
@@ -266,6 +266,9 @@ def clear_tasks():
             query = query.filter(Task.priority == None)
         else:
             query = query.filter_by(priority=priority)
+    search = request.form.get('search', '')
+    if search and search.strip():
+        query = query.filter(Task.title.ilike(f"%{search.strip()}%"))
             
     deleted_count = query.delete(synchronize_session=False)
     # print("deleted count ", deleted_count)
@@ -413,7 +416,7 @@ def export_csv():
     #     return redirect(url_for('auth.login'))
 
     query = Task.query.filter_by(user_id=session['user_id'])
-    print("task",tasks)
+    # print("task",tasks)
     
     status = request.args.get('status', 'All')
     search = request.args.get('search', '')
