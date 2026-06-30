@@ -10,9 +10,10 @@ app=create_app()  #function call for app creation
 # print("Current Working Directory:", os.getcwd())
 
 with app.app_context():
+    # print("DB URI:", app.config["SQLALCHEMY_DATABASE_URI"])
   
     db.create_all()
-
+    # print("Tables created!") 
 if __name__=="__main__":
     app.run(debug=False,port=5001)
     

@@ -13,6 +13,13 @@
       rel="stylesheet"
       href="{{ url_for('static' , filename='css/style.css') }}"
     />
+
+    <script>
+      (function () {
+        const saved = localStorage.getItem("theme") || "light";
+        document.documentElement.setAttribute("data-theme", saved);
+      })();
+    </script>
   </head>
   <body>
     <header>
@@ -29,6 +36,8 @@
           {% else %}
           <a href="{{ url_for('auth.login') }}">Login</a>
           {% endif %}
+          <button id="theme-toggle" class="theme-toggle" type="button" title="Toggle dark mode">🌙</button>
+
         </nav>
       </div>
     </header>
@@ -49,6 +58,26 @@
       function togglePassword(fieldName) {
         const input = document.getElementById(fieldName);
         input.type = input.type === "password" ? "text" : "password";
+      }
+
+      const themeToggleBtn = document.getElementById("theme-toggle");
+
+      function setToggleIcon(theme) {
+        if (themeToggleBtn) {
+          themeToggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+        }
+      }
+
+      setToggleIcon(document.documentElement.getAttribute("data-theme") || "light");
+
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", function () {
+          const current = document.documentElement.getAttribute("data-theme");
+          const next = current === "dark" ? "light" : "dark";
+          document.documentElement.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+          setToggleIcon(next);
+        });
       }
     </script>
   </body>
