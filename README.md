@@ -48,12 +48,12 @@ A production-grade, multi-user task management web application built with Flask.
 | Layer | Technology |
 |---|---|
 | Backend | Python, Flask |
-| Database | PostgreSQL (production), SQLAlchemy ORM |
+| Database | PostgreSQL (local via pgAdmin + production on Render), SQLAlchemy ORM |
 | Forms/Validation | Flask-WTF, WTForms |
 | Migrations | Flask-Migrate (Alembic) |
 | Auth | Session-based, Werkzeug password hashing |
 | Email | SendGrid HTTP API (transactional emails on Render) |
-| Frontend | Jinja2 templates, HTML, CSS (custom, no framework) |
+| Frontend | Jinja2 templates, HTML, Custom CSS (no CSS framework like Bootstrap/Tailwind) |
 | Deployment | Render, Gunicorn (WSGI) |
 
 ---
@@ -103,10 +103,12 @@ pip install -r requirements.txt
 Create a `.env` file in the project root:
 ```
 SECRET_KEY=your-secret-key
-DATABASE_URL=sqlite:///todo.db
+DATABASE_URL=postgresql://username:password@localhost:5432/todo_db
 SENDGRID_API_KEY=your-sendgrid-key       # optional, for password reset emails
 MAIL_DEFAULT_SENDER=your-email@example.com
 ```
+
+> Uses PostgreSQL both locally (via pgAdmin) and in production (Render). If `DATABASE_URL` is not set, the app falls back to a local SQLite file for quick testing.
 
 ### 5. Run database migrations
 ```bash
